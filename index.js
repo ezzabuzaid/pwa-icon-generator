@@ -36,6 +36,7 @@ const sizes = [
     new Link({ size: 192, rel: LinkRel.APPLE, showSizes: false }),
     new Link({ size: 16, type: 'image/png', }),
     new Link({ size: 32, type: 'image/png', }),
+    new Link({ size: 96, type: 'image/png', }),
     new Link({ size: 128, type: 'image/png', }),
     new Link({ size: 192, type: 'image/png', }),
     new Link({ size: 256, type: 'image/png', }),
@@ -114,23 +115,28 @@ const ios_splashscreen = [
 
 const iconPath = './logo.png';
 const pwaLink = 'pwa.html';
+console.log('generating different icons sizes');
 sizes.forEach((link) => {
+    const linkFileName = link.pathToIcon();
+    console.log(linkFileName);
     Jimp.read(iconPath)
         .then(logo => {
             fs.appendFileSync(pwaLink, link.generateLinkTag());
             return logo
                 .resize(link.size, link.size)
-                .write(link.pathToIcon());
-        });
+                .write(linkFileName);
+        }, err => console.error(err));
 });
 
-
+console.log('generating different splashscreen sizes');
 ios_splashscreen.forEach((splash) => {
+    const splashFileName = splash.pathToIcon(splash.width, splash.height);
+    console.log(splashFileName);
     Jimp.read(iconPath)
         .then(logo => {
             fs.appendFileSync(pwaLink, splash.generateLingTagForSplashScreenInIOS());
             return logo
                 .resize(splash.width, splash.height)
-                .write(splash.pathToIcon(splash.width, splash.height));
-        });
+                .write(splashFileName);
+        }, err => console.error(err));
 });
