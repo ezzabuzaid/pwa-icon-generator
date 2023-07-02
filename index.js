@@ -12,8 +12,11 @@ class Link {
         this.showSizes = showSizes;
     }
 
-    pathToIcon() {
-        return `./icons/icon-${this.sizes}.png`
+    pathToIcon(prefix) {
+        if(!prefix){
+            prefix='icon';
+        }
+        return `./icons/${prefix}-${this.sizes}.png`
     }
 
     generateLinkTag() {
@@ -41,6 +44,9 @@ const sizes = [
     new Link({ size: 192, type: 'image/png', }),
     new Link({ size: 256, type: 'image/png', }),
     new Link({ size: 384, type: 'image/png', }),
+    new Link({ size: 36, type: 'image/png', }),,
+    new Link({ size: 48, type: 'image/png', }),
+    new Link({ size: 114, type: 'image/png', }),
     new Link({ size: 512, type: 'image/png', }),
     new Link({ size: 57, rel: LinkRel.APPLE }),
     new Link({ size: 60, rel: LinkRel.APPLE }),
@@ -116,16 +122,19 @@ const ios_splashscreen = [
 const iconPath = './logo.png';
 const pwaLink = 'pwa.html';
 console.log('generating different icons sizes');
-sizes.forEach((link) => {
-    const linkFileName = link.pathToIcon();
-    console.log(linkFileName);
-    Jimp.read(iconPath)
-        .then(logo => {
-            fs.appendFileSync(pwaLink, link.generateLinkTag());
-            return logo
-                .resize(link.size, link.size)
-                .write(linkFileName);
-        }, err => console.error(err));
+const iconPrefixes = ['icon','android-icon','apple-icon','favicon','ms-icon'];
+iconPrefixes.forEach((prefix)=>{
+    sizes.forEach((link) => {
+        const linkFileName = link.pathToIcon(prefix);
+        console.log(linkFileName);
+        Jimp.read(iconPath)
+            .then(logo => {
+                fs.appendFileSync(pwaLink, link.generateLinkTag());
+                return logo
+                    .resize(link.size, link.size)
+                    .write(linkFileName);
+            }, err => console.error(err));
+    });
 });
 
 console.log('generating different splashscreen sizes');
